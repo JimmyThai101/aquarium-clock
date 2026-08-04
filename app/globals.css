@@ -1,0 +1,529 @@
+@import "tailwindcss";
+
+:root {
+  --background: #124860;
+  --foreground: #eef8fc;
+  --clock-shadow: 0 8px 40px rgba(4, 30, 48, 0.4);
+  --control-bg: rgba(10, 40, 58, 0.5);
+  --control-border: rgba(180, 230, 255, 0.28);
+  --control-hover: rgba(14, 55, 78, 0.72);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* ——— App shell ——— */
+
+.aquarium-clock {
+  position: relative;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.aquarium-clock-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+  padding: 1.25rem 1rem 1.5rem;
+  pointer-events: none;
+}
+
+.aquarium-clock-content > * {
+  pointer-events: auto;
+}
+
+/* ——— Clock ——— */
+
+.clock-display {
+  display: flex;
+  max-width: min(92vw, 40rem);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.35rem 1.75rem 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(180, 230, 255, 0.18);
+  background: linear-gradient(
+    165deg,
+    rgba(8, 36, 54, 0.48) 0%,
+    rgba(10, 48, 70, 0.32) 100%
+  );
+  backdrop-filter: blur(14px);
+  box-shadow: var(--clock-shadow);
+}
+
+.clock-brand {
+  margin: 0 0 0.4rem;
+  font-size: clamp(0.85rem, 2.2vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(186, 230, 253, 0.92);
+  text-shadow: 0 1px 10px rgba(0, 40, 60, 0.4);
+}
+
+.clock-time {
+  margin: 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(2.75rem, 12vw, 6.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  color: #f2faff;
+  text-shadow:
+    0 0 40px rgba(120, 200, 240, 0.25),
+    0 2px 4px rgba(0, 20, 40, 0.35),
+    0 10px 30px rgba(0, 20, 40, 0.4);
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-date {
+  margin: 0.65rem 0 0;
+  font-size: clamp(0.95rem, 3vw, 1.25rem);
+  font-weight: 500;
+  color: rgba(210, 240, 255, 0.92);
+  text-shadow: 0 1px 10px rgba(0, 20, 40, 0.4);
+}
+
+.clock-period {
+  margin: 0.4rem 0 0;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(150, 210, 240, 0.8);
+}
+
+.clock-loading {
+  display: flex;
+  min-height: 5.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  color: rgba(230, 248, 255, 0.85);
+}
+
+.clock-loading-pulse {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  animation: clock-spin 0.9s linear infinite;
+}
+
+@keyframes clock-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ——— Controls ——— */
+
+.clock-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+  max-width: 100%;
+}
+
+.clock-btn {
+  min-height: 2.75rem;
+  min-width: 6.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--control-border);
+  border-radius: 0.85rem;
+  background: var(--control-bg);
+  color: #e8f6ff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 18px rgba(0, 30, 50, 0.22);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.clock-btn:hover {
+  background: var(--control-hover);
+  border-color: rgba(170, 225, 255, 0.5);
+  box-shadow: 0 6px 22px rgba(40, 120, 160, 0.25);
+}
+
+.clock-btn:active {
+  transform: scale(0.98);
+}
+
+.clock-btn[aria-pressed="true"] {
+  border-color: rgba(140, 220, 255, 0.7);
+  background: rgba(30, 90, 120, 0.65);
+}
+
+/* ——— Aquarium scene ——— */
+
+.aquarium {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    var(--water-top) 0%,
+    var(--water-mid) 48%,
+    var(--water-bottom) 100%
+  );
+  transition: background 1.4s ease;
+}
+
+.aquarium-surface {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 34%;
+  background:
+    radial-gradient(
+      ellipse 80% 65% at 50% -15%,
+      var(--water-glow),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 30% at 20% 10%,
+      rgba(200, 240, 255, 0.12),
+      transparent 70%
+    );
+  pointer-events: none;
+}
+
+.aquarium-sand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 12%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--sand-color) 55%, transparent) 35%,
+    var(--sand-color) 100%
+  );
+  pointer-events: none;
+}
+
+.aquarium-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    rgba(0, 10, 20, 0.35) 100%
+  );
+  pointer-events: none;
+}
+
+/* Light rays */
+
+.aquarium-rays {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aquarium-ray {
+  position: absolute;
+  top: -5%;
+  height: 75%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.05) 55%,
+    transparent 100%
+  );
+  transform-origin: top center;
+  animation: ray-pulse var(--ray-duration) ease-in-out var(--ray-delay) infinite
+    alternate;
+  filter: blur(1px);
+}
+
+@keyframes ray-pulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Particles */
+
+.aquarium-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.aquarium-particle {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgba(230, 250, 255, 0.85);
+  animation: particle-drift var(--particle-duration) ease-in-out
+    var(--particle-delay) infinite alternate;
+}
+
+@keyframes particle-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(12px, -18px);
+  }
+}
+
+/* Bubbles */
+
+.aquarium-bubbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.aquarium-bubble {
+  position: absolute;
+  bottom: -2%;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.55),
+    rgba(200, 235, 255, 0.12) 55%,
+    transparent 70%
+  );
+  animation: bubble-rise var(--bubble-duration) linear var(--bubble-delay)
+    infinite;
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.85);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(8px, -105vh, 0) scale(1.05);
+    opacity: 0;
+  }
+}
+
+/* Fish */
+
+.aquarium-fish-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.aquarium-fish {
+  position: absolute;
+  left: 0;
+  will-change: transform;
+  animation: fish-bob calc(var(--fish-duration) / 4) ease-in-out
+    var(--fish-delay) infinite alternate;
+}
+
+.aquarium-fish--ltr {
+  animation:
+    fish-swim-ltr var(--fish-duration) linear var(--fish-delay) infinite,
+    fish-bob calc(var(--fish-duration) / 4) ease-in-out var(--fish-delay)
+      infinite alternate;
+}
+
+.aquarium-fish--rtl {
+  animation:
+    fish-swim-rtl var(--fish-duration) linear var(--fish-delay) infinite,
+    fish-bob calc(var(--fish-duration) / 4) ease-in-out var(--fish-delay)
+      infinite alternate;
+}
+
+@keyframes fish-swim-ltr {
+  from {
+    transform: translateX(-20vw);
+  }
+  to {
+    transform: translateX(120vw);
+  }
+}
+
+@keyframes fish-swim-rtl {
+  from {
+    transform: translateX(120vw);
+  }
+  to {
+    transform: translateX(-20vw);
+  }
+}
+
+@keyframes fish-bob {
+  from {
+    margin-top: calc(var(--fish-bob) * -1);
+  }
+  to {
+    margin-top: var(--fish-bob);
+  }
+}
+
+/* Seaweed */
+
+.aquarium-seaweed {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6%;
+  height: 40%;
+  pointer-events: none;
+}
+
+.aquarium-plant {
+  position: absolute;
+  bottom: 0;
+  transform-origin: 50% 100%;
+  animation: plant-sway var(--plant-duration) ease-in-out var(--plant-delay)
+    infinite alternate;
+}
+
+@keyframes plant-sway {
+  from {
+    transform: rotate(calc(var(--plant-sway) * -1));
+  }
+  to {
+    transform: rotate(var(--plant-sway));
+  }
+}
+
+/* Reduced motion — OS preference until JS applies an explicit allow/reduce class */
+
+@media (prefers-reduced-motion: reduce) {
+  .aquarium:not(.aquarium--allow-motion) .aquarium-fish,
+  .aquarium:not(.aquarium--allow-motion) .aquarium-bubble,
+  .aquarium:not(.aquarium--allow-motion) .aquarium-plant,
+  .aquarium:not(.aquarium--allow-motion) .aquarium-ray,
+  .aquarium:not(.aquarium--allow-motion) .aquarium-particle {
+    animation: none !important;
+  }
+
+  .aquarium:not(.aquarium--allow-motion) .aquarium-fish {
+    left: 15%;
+    transform: none;
+    margin-top: 0;
+  }
+
+  .aquarium:not(.aquarium--allow-motion) .aquarium-fish:nth-child(2) {
+    left: 45%;
+  }
+
+  .aquarium:not(.aquarium--allow-motion) .aquarium-fish:nth-child(3) {
+    left: 70%;
+  }
+
+  .aquarium:not(.aquarium--allow-motion) .aquarium-fish:nth-child(4) {
+    left: 25%;
+  }
+
+  .aquarium:not(.aquarium--allow-motion) .aquarium-fish:nth-child(5) {
+    left: 55%;
+  }
+
+  .aquarium:not(.aquarium--allow-motion) .aquarium-fish:nth-child(6) {
+    left: 80%;
+  }
+
+  .aquarium:not(.aquarium--allow-motion) .aquarium-bubble {
+    bottom: 20%;
+    opacity: 0.2;
+  }
+
+  .clock-loading-pulse {
+    animation: none;
+    border-color: rgba(255, 255, 255, 0.55);
+  }
+}
+
+.aquarium--reduced-motion .aquarium-fish,
+.aquarium--reduced-motion .aquarium-bubble,
+.aquarium--reduced-motion .aquarium-plant,
+.aquarium--reduced-motion .aquarium-ray,
+.aquarium--reduced-motion .aquarium-particle {
+  animation: none !important;
+}
+
+.aquarium--reduced-motion .aquarium-fish {
+  left: 15%;
+  transform: none;
+  margin-top: 0;
+}
+
+.aquarium--reduced-motion .aquarium-fish:nth-child(2) {
+  left: 45%;
+}
+
+.aquarium--reduced-motion .aquarium-fish:nth-child(3) {
+  left: 70%;
+}
+
+.aquarium--reduced-motion .aquarium-fish:nth-child(4) {
+  left: 25%;
+}
+
+.aquarium--reduced-motion .aquarium-fish:nth-child(5) {
+  left: 55%;
+}
+
+.aquarium--reduced-motion .aquarium-fish:nth-child(6) {
+  left: 80%;
+}
+
+.aquarium--reduced-motion .aquarium-bubble {
+  bottom: 20%;
+  opacity: 0.2;
+}
+
+@media (max-width: 480px) {
+  .clock-display {
+    padding: 1rem 1.1rem;
+  }
+
+  .clock-controls {
+    gap: 0.5rem;
+  }
+
+  .clock-btn {
+    min-width: 5.75rem;
+    flex: 1 1 auto;
+    max-width: 9rem;
+  }
+}
