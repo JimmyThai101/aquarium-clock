@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Aquarium } from "@/components/aquarium/Aquarium";
 import { ClockControls } from "@/components/ClockControls";
 import { ClockDisplay } from "@/components/ClockDisplay";
@@ -7,6 +8,8 @@ import { useClock } from "@/hooks/useClock";
 import { useFullscreen } from "@/hooks/useFullscreen";
 import { useLighting } from "@/hooks/useLighting";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+
+const DEFAULT_TAB_TITLE = "Aquarium Clock";
 
 /**
  * Client shell: aquarium background + clock + controls.
@@ -18,6 +21,18 @@ export function AquariumClock() {
   const { isFullscreen, toggleFullscreen } = useFullscreen();
   const { reducedMotion, ready: motionReady, toggleReducedMotion } =
     useReducedMotion();
+
+  useEffect(() => {
+    document.title = clock.timeLabel
+      ? `${clock.timeLabel} · ${DEFAULT_TAB_TITLE}`
+      : DEFAULT_TAB_TITLE;
+  }, [clock.timeLabel]);
+
+  useEffect(() => {
+    return () => {
+      document.title = DEFAULT_TAB_TITLE;
+    };
+  }, []);
 
   return (
     <div className="aquarium-clock">
