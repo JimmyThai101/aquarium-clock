@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { STORAGE_KEYS } from "@/config/aquarium";
+import { storageGet, storageSet } from "@/lib/storage";
 import {
   LOOK_FISH_COLORS,
   LOOK_LABELS,
@@ -23,7 +24,7 @@ function subscribeLook(onChange: () => void) {
 }
 
 function readLook(): LookId {
-  const saved = window.localStorage.getItem(STORAGE_KEYS.look);
+  const saved = storageGet(STORAGE_KEYS.look);
   return isLookId(saved) ? saved : "classic";
 }
 
@@ -36,7 +37,7 @@ export function useLook() {
   );
 
   const setLook = (next: LookId) => {
-    window.localStorage.setItem(STORAGE_KEYS.look, next);
+    storageSet(STORAGE_KEYS.look, next);
     window.dispatchEvent(new Event(LOOK_EVENT));
   };
 

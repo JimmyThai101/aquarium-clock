@@ -7,6 +7,7 @@ import {
   type ClockFormat,
   type TimeOfDay,
 } from "@/config/aquarium";
+import { storageGet, storageSet } from "@/lib/storage";
 
 export type ClockState = {
   /** False until the client has mounted — avoids hydration mismatches. */
@@ -25,7 +26,7 @@ export type ClockState = {
 const FORMAT_EVENT = "aquarium-clock-format-change";
 
 function readFormat(): ClockFormat {
-  const saved = window.localStorage.getItem(STORAGE_KEYS.format);
+  const saved = storageGet(STORAGE_KEYS.format);
   return saved === "12" || saved === "24" ? saved : "12";
 }
 
@@ -98,7 +99,7 @@ export function useClock(): ClockState {
   }, []);
 
   const setFormat = (next: ClockFormat) => {
-    window.localStorage.setItem(STORAGE_KEYS.format, next);
+    storageSet(STORAGE_KEYS.format, next);
     window.dispatchEvent(new Event(FORMAT_EVENT));
   };
 

@@ -15,12 +15,16 @@ type ClockDisplayProps = {
 };
 
 function worldTime(now: Date, timeZone: string, format: ClockFormat): string {
-  return now.toLocaleTimeString(undefined, {
-    hour: format === "12" ? "numeric" : "2-digit",
-    minute: "2-digit",
-    hour12: format === "12",
-    timeZone,
-  });
+  try {
+    return now.toLocaleTimeString(undefined, {
+      hour: format === "12" ? "numeric" : "2-digit",
+      minute: "2-digit",
+      hour12: format === "12",
+      timeZone,
+    });
+  } catch {
+    return "--";
+  }
 }
 
 const RING_LENGTH = 100;

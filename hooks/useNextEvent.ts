@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { STORAGE_KEYS } from "@/config/aquarium";
+import { storageGet, storageRemove, storageSet } from "@/lib/storage";
 
 export type ClockEvent = {
   label: string;
@@ -10,7 +11,7 @@ export type ClockEvent = {
 
 const EVENT_CHANGE = "aquarium-clock-event-change";
 const MAX_LABEL = 40;
-const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
+const OVERDUE_HIDE_MS = 2 * 60 * 1000;
 
 function subscribeEvent(onChange: () => void) {
   window.addEventListener("storage", onChange);
@@ -27,7 +28,7 @@ function sanitizeLabel(label: string): string {
 }
 
 function readEvent(): ClockEvent | null {
-  const raw = window.localStorage.getItem(STORAGE_KEYS.event);
+  const raw = storageGet(STORAGE_KEYS.event);
   if (!raw) return null;
 
   try {
@@ -36,7 +37,7 @@ function readEvent(): ClockEvent | null {
       return null;
     }
     if (!Number.isFinite(parsed.at)) return null;
-    if (Date.now() - parsed.at > STALE_AFTER_MS) {
+    if (parsed.at < Date.now() - OVERDUE_HIDE_MS) {
       return null;
     }
     return { label: sanitizeLabel(parsed.label), at: parsed.at };
@@ -47,9 +48,9 @@ function readEvent(): ClockEvent | null {
 
 function writeEvent(event: ClockEvent | null) {
   if (!event) {
-    window.localStorage.removeItem(STORAGE_KEYS.event);
+    storageRemove(STORAGE_KEYS.event);
   } else {
-    window.localStorage.setItem(STORAGE_KEYS.event, JSON.stringify(event));
+    storageSet(STORAGE_KEYS.event, JSON.stringify(event));
   }
   window.dispatchEvent(new Event(EVENT_CHANGE));
 }

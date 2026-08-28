@@ -56,6 +56,14 @@ export function EventPanel({
       aria-label="Set next event"
       onClick={(click) => click.stopPropagation()}
     >
+      <button
+        type="button"
+        className="event-panel-close"
+        onClick={onClose}
+        aria-label="Close event panel"
+      >
+        Close
+      </button>
       <p className="event-panel-title">Next event</p>
       {event && targetTimeLabel ? (
         <p className="event-panel-current">Set for {targetTimeLabel}</p>

@@ -50,6 +50,19 @@ export function AquariumClock() {
   const idle = useIdleUi(eventPanelOpen);
 
   useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setEventPanelOpen(false);
+      if (nextEvent.isDue) nextEvent.clearEvent();
+      if (document.fullscreenElement) {
+        void document.exitFullscreen();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [nextEvent]);
+
+  useEffect(() => {
     if (!clock.timeLabel) {
       document.title = DEFAULT_TAB_TITLE;
       return;
@@ -121,10 +134,9 @@ export function AquariumClock() {
 
       {eventPanelOpen ? (
         <div className="event-overlay">
-          <button
-            type="button"
+          <div
             className="event-overlay-scrim"
-            aria-label="Close event panel"
+            role="presentation"
             onClick={() => setEventPanelOpen(false)}
           />
           <EventPanel

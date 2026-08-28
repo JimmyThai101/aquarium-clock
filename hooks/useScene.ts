@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { STORAGE_KEYS } from "@/config/aquarium";
+import { storageGet, storageSet } from "@/lib/storage";
 import {
   SCENE_LABELS,
   isSceneId,
@@ -21,7 +22,7 @@ function subscribeScene(onChange: () => void) {
 }
 
 function readScene(): SceneId {
-  const saved = window.localStorage.getItem(STORAGE_KEYS.scene);
+  const saved = storageGet(STORAGE_KEYS.scene);
   return isSceneId(saved) ? saved : "aquarium";
 }
 
@@ -36,7 +37,7 @@ export function useScene() {
   );
 
   const setScene = (next: SceneId) => {
-    window.localStorage.setItem(STORAGE_KEYS.scene, next);
+    storageSet(STORAGE_KEYS.scene, next);
     window.dispatchEvent(new Event(SCENE_EVENT));
   };
 

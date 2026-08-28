@@ -10,6 +10,7 @@ import {
   type LightingMode,
   type TimeOfDay,
 } from "@/config/aquarium";
+import { storageGet, storageSet } from "@/lib/storage";
 
 const LIGHTING_EVENT = "aquarium-clock-lighting-change";
 
@@ -23,7 +24,7 @@ function subscribeLighting(onChange: () => void) {
 }
 
 function readLightingMode(): LightingMode {
-  const saved = window.localStorage.getItem(STORAGE_KEYS.lighting);
+  const saved = storageGet(STORAGE_KEYS.lighting);
   return isLightingMode(saved) ? saved : "auto";
 }
 
@@ -46,7 +47,7 @@ export function useLighting(now: Date | null) {
     lightingMode === "auto" ? naturalTimeOfDay : lightingMode;
 
   const setLightingMode = (mode: LightingMode) => {
-    window.localStorage.setItem(STORAGE_KEYS.lighting, mode);
+    storageSet(STORAGE_KEYS.lighting, mode);
     window.dispatchEvent(new Event(LIGHTING_EVENT));
   };
 

@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { STORAGE_KEYS } from "@/config/aquarium";
+import { storageGet, storageSet } from "@/lib/storage";
 
 const MOTION_EVENT = "aquarium-clock-motion-change";
 
@@ -19,7 +20,7 @@ function subscribeMotion(onChange: () => void) {
 
 function readReducedMotion(): boolean {
   const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const saved = window.localStorage.getItem(STORAGE_KEYS.reducedMotion);
+  const saved = storageGet(STORAGE_KEYS.reducedMotion);
 
   if (saved === "true") return true;
   if (saved === "false") return false;
@@ -50,7 +51,7 @@ export function useReducedMotion() {
   );
 
   const setReducedMotion = (value: boolean) => {
-    window.localStorage.setItem(
+    storageSet(
       STORAGE_KEYS.reducedMotion,
       value ? "true" : "false",
     );

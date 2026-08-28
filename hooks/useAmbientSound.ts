@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useSyncExternalStore } from "react";
 import { STORAGE_KEYS } from "@/config/aquarium";
+import { storageGet, storageSet } from "@/lib/storage";
 
 const SOUND_EVENT = "aquarium-clock-sound-change";
 
@@ -16,7 +17,7 @@ function subscribeSound(onChange: () => void) {
 }
 
 function readSound(): boolean {
-  return window.localStorage.getItem(STORAGE_KEYS.sound) === "on";
+  return storageGet(STORAGE_KEYS.sound) === "on";
 }
 
 function playBubble(ctx: AudioContext) {
@@ -42,49 +43,70 @@ export function useAmbientSound() {
   useEffect(() => {
     if (!enabled) return;
 
-    const ctx = new AudioContext();
-    const bufferSize = ctx.sampleRate * 2;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i += 1) {
-      data[i] = Math.random() * 2 - 1;
+    let ctx: AudioContext;
+    try {
+      ctx = new AudioContext();
+    } catch {
+      storageSet(STORAGE_KEYS.sound, "off");
+      window.dispatchEvent(new Event(SOUND_EVENT));
+      return;
     }
 
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    noise.loop = true;
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 380;
-
-    const gain = ctx.createGain();
-    gain.gain.value = 0.035;
-
-    noise.connect(filter).connect(gain).connect(ctx.destination);
-    void ctx.resume();
-    noise.start();
-
-    let bubbleTimer = 0;
-    const scheduleBubble = () => {
-      playBubble(ctx);
-      bubbleTimer = window.setTimeout(scheduleBubble, 1400 + Math.random() * 2200);
-    };
-    bubbleTimer = window.setTimeout(scheduleBubble, 800);
-
-    return () => {
-      window.clearTimeout(bubbleTimer);
-      try {
-        noise.stop();
-      } catch {
-        // Already stopped.
+    try {
+      const bufferSize = ctx.sampleRate * 2;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i += 1) {
+        data[i] = Math.random() * 2 - 1;
       }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      noise.loop = true;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = 380;
+
+      const gain = ctx.createGain();
+      gain.gain.value = 0.035;
+
+      noise.connect(filter).connect(gain).connect(ctx.destination);
+      void ctx.resume();
+      noise.start();
+
+      let bubbleTimer = 0;
+      const scheduleBubble = () => {
+        try {
+          playBubble(ctx);
+        } catch {
+          // Audio graph may already be closed.
+        }
+        bubbleTimer = window.setTimeout(
+          scheduleBubble,
+          1400 + Math.random() * 2200,
+        );
+      };
+      bubbleTimer = window.setTimeout(scheduleBubble, 800);
+
+      return () => {
+        window.clearTimeout(bubbleTimer);
+        try {
+          noise.stop();
+        } catch {
+          // Already stopped.
+        }
+        void ctx.close();
+      };
+    } catch {
       void ctx.close();
-    };
+      storageSet(STORAGE_KEYS.sound, "off");
+      window.dispatchEvent(new Event(SOUND_EVENT));
+    }
   }, [enabled]);
 
   const setEnabled = (value: boolean) => {
-    window.localStorage.setItem(STORAGE_KEYS.sound, value ? "on" : "off");
+    storageSet(STORAGE_KEYS.sound, value ? "on" : "off");
     window.dispatchEvent(new Event(SOUND_EVENT));
   };
 
