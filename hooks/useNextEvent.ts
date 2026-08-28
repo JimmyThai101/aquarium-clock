@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { STORAGE_KEYS } from "@/config/aquarium";
 import { storageGet, storageRemove, storageSet } from "@/lib/storage";
 
@@ -12,6 +12,8 @@ export type ClockEvent = {
 const EVENT_CHANGE = "aquarium-clock-event-change";
 const MAX_LABEL = 40;
 const OVERDUE_HIDE_MS = 2 * 60 * 1000;
+
+let cachedEvent: ClockEvent | null | undefined;
 
 function subscribeEvent(onChange: () => void) {
   window.addEventListener("storage", onChange);
@@ -27,7 +29,7 @@ function sanitizeLabel(label: string): string {
   return trimmed || "Focus ends";
 }
 
-function readEvent(): ClockEvent | null {
+function parseStoredEvent(): ClockEvent | null {
   const raw = storageGet(STORAGE_KEYS.event);
   if (!raw) return null;
 
@@ -37,16 +39,34 @@ function readEvent(): ClockEvent | null {
       return null;
     }
     if (!Number.isFinite(parsed.at)) return null;
-    if (parsed.at < Date.now() - OVERDUE_HIDE_MS) {
-      return null;
-    }
+    if (parsed.at < Date.now() - OVERDUE_HIDE_MS) return null;
     return { label: sanitizeLabel(parsed.label), at: parsed.at };
   } catch {
     return null;
   }
 }
 
+function sameEvent(a: ClockEvent | null, b: ClockEvent | null): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return a.label === b.label && a.at === b.at;
+}
+
+/**
+ * Must return a stable reference when the stored event has not changed,
+ * or React will re-render in a loop and the countdown never settles.
+ */
+function readEvent(): ClockEvent | null {
+  const next = parseStoredEvent();
+  if (cachedEvent !== undefined && sameEvent(cachedEvent, next)) {
+    return cachedEvent;
+  }
+  cachedEvent = next;
+  return cachedEvent;
+}
+
 function writeEvent(event: ClockEvent | null) {
+  cachedEvent = event;
   if (!event) {
     storageRemove(STORAGE_KEYS.event);
   } else {
@@ -55,12 +75,14 @@ function writeEvent(event: ClockEvent | null) {
   window.dispatchEvent(new Event(EVENT_CHANGE));
 }
 
-/** Next wall-clock time today, or tomorrow if that time already passed. */
+/** Next wall-clock time today. Same minute still counts as today, not tomorrow. */
 export function nextOccurrence(timeHHmm: string, now: Date): Date {
-  const [hours, minutes] = timeHHmm.split(":").map(Number);
+  const parts = timeHHmm.split(":").map(Number);
+  const hours = parts[0] || 0;
+  const minutes = parts[1] || 0;
   const next = new Date(now);
-  next.setHours(hours || 0, minutes || 0, 0, 0);
-  if (next.getTime() <= now.getTime()) {
+  next.setHours(hours, minutes, 0, 0);
+  if (next.getTime() < now.getTime() - 60 * 1000) {
     next.setDate(next.getDate() + 1);
   }
   return next;
@@ -83,12 +105,46 @@ function formatTargetTime(at: number): string {
   });
 }
 
+export function setEventAt(label: string, timeHHmm: string, from: Date) {
+  writeEvent({
+    label: sanitizeLabel(label),
+    at: nextOccurrence(timeHHmm, from).getTime(),
+  });
+}
+
+export function setTimer(
+  label: string,
+  minutes: number,
+  seconds: number,
+  from: Date,
+) {
+  const mins = Number.isFinite(minutes) ? Math.max(0, Math.round(minutes)) : 0;
+  const secs = Number.isFinite(seconds) ? Math.max(0, Math.round(seconds)) : 0;
+  const totalMs = (mins * 60 + secs) * 1000;
+  const duration = Math.min(180 * 60 * 1000, Math.max(5 * 1000, totalMs));
+  writeEvent({
+    label: sanitizeLabel(label),
+    at: from.getTime() + duration,
+  });
+}
+
+export function clearEvent() {
+  writeEvent(null);
+}
+
 /**
  * One upcoming named event / alarm, persisted in localStorage.
  * Counts down from the live clock tick.
  */
 export function useNextEvent(now: Date | null) {
   const event = useSyncExternalStore(subscribeEvent, readEvent, () => null);
+
+  useEffect(() => {
+    if (!event) return;
+    if (event.at < Date.now() - OVERDUE_HIDE_MS) {
+      clearEvent();
+    }
+  }, [event]);
 
   const remainingMs = event && now ? event.at - now.getTime() : null;
   const isDue = remainingMs !== null && remainingMs <= 0;
@@ -100,26 +156,6 @@ export function useNextEvent(now: Date | null) {
         ? `${event.label} · now`
         : `${event.label} in ${formatRemaining(remainingMs)}`
       : null;
-
-  const setEventAt = (label: string, timeHHmm: string, from: Date) => {
-    writeEvent({
-      label: sanitizeLabel(label),
-      at: nextOccurrence(timeHHmm, from).getTime(),
-    });
-  };
-
-  const setTimer = (label: string, minutes: number, from: Date) => {
-    const clamped = Math.min(180, Math.max(1, Math.round(minutes)));
-    if (!Number.isFinite(clamped)) return;
-    writeEvent({
-      label: sanitizeLabel(label),
-      at: from.getTime() + clamped * 60 * 1000,
-    });
-  };
-
-  const clearEvent = () => {
-    writeEvent(null);
-  };
 
   return {
     event,

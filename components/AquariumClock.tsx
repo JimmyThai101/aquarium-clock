@@ -60,7 +60,7 @@ export function AquariumClock() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [nextEvent]);
+  }, [nextEvent.isDue, nextEvent.clearEvent]);
 
   useEffect(() => {
     if (!clock.timeLabel) {
@@ -142,6 +142,7 @@ export function AquariumClock() {
           <EventPanel
             event={nextEvent.event}
             now={clock.now}
+            remainingLabel={nextEvent.remainingLabel}
             targetTimeLabel={nextEvent.targetTimeLabel}
             onSetAt={nextEvent.setEventAt}
             onSetTimer={nextEvent.setTimer}

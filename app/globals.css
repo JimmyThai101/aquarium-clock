@@ -513,6 +513,17 @@ body {
   background: rgba(30, 90, 120, 0.65);
 }
 
+.event-timer-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem 0.5rem;
+}
+
+.event-timer-fields .event-panel-current {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .event-actions {
   display: flex;
   gap: 0.5rem;

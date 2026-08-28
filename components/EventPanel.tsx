@@ -1,23 +1,34 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import type { ClockEvent } from "@/hooks/useNextEvent";
+import { formatRemaining, type ClockEvent } from "@/hooks/useNextEvent";
 
 type EventMode = "at" | "timer";
 
 type EventPanelProps = {
   event: ClockEvent | null;
   now: Date | null;
+  remainingLabel: string | null;
   targetTimeLabel: string | null;
   onSetAt: (label: string, timeHHmm: string, from: Date) => void;
-  onSetTimer: (label: string, minutes: number, from: Date) => void;
+  onSetTimer: (
+    label: string,
+    minutes: number,
+    seconds: number,
+    from: Date,
+  ) => void;
   onClear: () => void;
   onClose: () => void;
 };
 
 function defaultTimeValue(now: Date | null): string {
-  const date = now ? new Date(now.getTime() + 60 * 60 * 1000) : new Date();
+  const date = now ? new Date(now.getTime() + 60 * 1000) : new Date();
   return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
+function previewTimer(minutes: number, seconds: number): string {
+  const totalMs = Math.max(5 * 1000, (minutes * 60 + seconds) * 1000);
+  return formatRemaining(totalMs);
 }
 
 /**
@@ -26,6 +37,7 @@ function defaultTimeValue(now: Date | null): string {
 export function EventPanel({
   event,
   now,
+  remainingLabel,
   targetTimeLabel,
   onSetAt,
   onSetTimer,
@@ -36,15 +48,17 @@ export function EventPanel({
   const [mode, setMode] = useState<EventMode>("timer");
   const [label, setLabel] = useState(event?.label ?? "Focus ends");
   const [timeValue, setTimeValue] = useState(defaultTimeValue(now));
-  const [minutes, setMinutes] = useState(25);
+  const [minutes, setMinutes] = useState(5);
+  const [seconds, setSeconds] = useState(0);
 
   const handleSubmit = (formEvent: FormEvent) => {
     formEvent.preventDefault();
     const from = now ?? new Date();
     if (mode === "at") {
+      if (!timeValue) return;
       onSetAt(label, timeValue, from);
     } else {
-      onSetTimer(label, minutes, from);
+      onSetTimer(label, minutes, seconds, from);
     }
     onClose();
   };
@@ -65,7 +79,9 @@ export function EventPanel({
         Close
       </button>
       <p className="event-panel-title">Next event</p>
-      {event && targetTimeLabel ? (
+      {remainingLabel ? (
+        <p className="event-panel-current">{remainingLabel}</p>
+      ) : event && targetTimeLabel ? (
         <p className="event-panel-current">Set for {targetTimeLabel}</p>
       ) : (
         <p className="event-panel-current">No event yet</p>
@@ -104,17 +120,33 @@ export function EventPanel({
       </div>
 
       {mode === "timer" ? (
-        <label className="event-field">
-          Minutes
-          <input
-            className="event-input"
-            type="number"
-            min={1}
-            max={180}
-            value={minutes}
-            onChange={(change) => setMinutes(Number(change.target.value))}
-          />
-        </label>
+        <div className="event-timer-fields">
+          <label className="event-field">
+            Minutes
+            <input
+              className="event-input"
+              type="number"
+              min={0}
+              max={180}
+              value={minutes}
+              onChange={(change) => setMinutes(Number(change.target.value))}
+            />
+          </label>
+          <label className="event-field">
+            Seconds
+            <input
+              className="event-input"
+              type="number"
+              min={0}
+              max={59}
+              value={seconds}
+              onChange={(change) => setSeconds(Number(change.target.value))}
+            />
+          </label>
+          <p className="event-panel-current">
+            Counts down {previewTimer(minutes, seconds)}
+          </p>
+        </div>
       ) : (
         <label className="event-field">
           Time
