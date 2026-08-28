@@ -239,18 +239,29 @@ body {
 .clock-second-ring-progress {
   fill: none;
   stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .clock-second-ring-track {
-  stroke: rgba(180, 230, 255, 0.16);
-  stroke-width: 1.15;
+  stroke: rgba(180, 230, 255, 0.22);
+  stroke-width: 3;
 }
 
 .clock-second-ring-progress {
-  stroke: rgba(210, 245, 255, 0.85);
-  stroke-width: 1.35;
-  filter: drop-shadow(0 0 4px rgba(160, 230, 255, 0.55));
-  transform-origin: 50% 50%;
+  stroke: rgba(210, 245, 255, 0.95);
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 6px rgba(160, 230, 255, 0.65));
+}
+
+.clock-second-ring--spin .clock-second-ring-progress {
+  stroke-dasharray: 28 72;
+  animation: ring-spin 1.15s linear infinite;
+}
+
+@keyframes ring-spin {
+  to {
+    stroke-dashoffset: -100;
+  }
 }
 
 .clock-minute-ripple {
@@ -320,21 +331,6 @@ body {
   gap: 0.75rem;
   font-size: 1rem;
   color: rgba(230, 248, 255, 0.85);
-}
-
-.clock-loading-pulse {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-top-color: rgba(255, 255, 255, 0.9);
-  animation: clock-spin 0.9s linear infinite;
-}
-
-@keyframes clock-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /* ——— Controls ——— */
@@ -803,11 +799,6 @@ body {
   .aquarium:not(.aquarium--allow-motion) .aquarium-bubble {
     bottom: 20%;
     opacity: 0.2;
-  }
-
-  .clock-loading-pulse {
-    animation: none;
-    border-color: rgba(255, 255, 255, 0.55);
   }
 }
 

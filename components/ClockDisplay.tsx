@@ -59,30 +59,39 @@ export function ClockDisplay({
       <span className="clock-droplet clock-droplet--c" aria-hidden="true" />
       <span className="clock-minute-ripple" aria-hidden="true" />
 
-      <svg className="clock-second-ring" viewBox="0 0 100 100" aria-hidden="true">
+      <svg
+        className={`clock-second-ring${ready ? "" : " clock-second-ring--spin"}`}
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
         <rect
           className="clock-second-ring-track"
-          x="2.5"
-          y="2.5"
-          width="95"
-          height="95"
-          rx="14"
+          x="1.8"
+          y="1.8"
+          width="96.4"
+          height="96.4"
+          rx="7"
           pathLength={RING_LENGTH}
         />
         <rect
           className="clock-second-ring-progress"
-          x="2.5"
-          y="2.5"
-          width="95"
-          height="95"
-          rx="14"
+          x="1.8"
+          y="1.8"
+          width="96.4"
+          height="96.4"
+          rx="7"
           pathLength={RING_LENGTH}
-          style={{
-            strokeDasharray: `${RING_LENGTH}`,
-            strokeDashoffset: ringOffset,
-            transition:
-              seconds === 0 ? "none" : "stroke-dashoffset 1s linear",
-          }}
+          style={
+            ready
+              ? {
+                  strokeDasharray: `${RING_LENGTH}`,
+                  strokeDashoffset: ringOffset,
+                  transition:
+                    seconds === 0 ? "none" : "stroke-dashoffset 1s linear",
+                }
+              : undefined
+          }
         />
       </svg>
 
@@ -125,7 +134,6 @@ export function ClockDisplay({
         </>
       ) : (
         <div className="clock-loading" role="status" aria-live="polite">
-          <span className="clock-loading-pulse" aria-hidden="true" />
           <span>Preparing clock…</span>
         </div>
       )}
