@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
  * Hides chrome after a quiet stretch. Movement, taps, or keys bring it back.
  * Pause while a panel that needs the toolbar is open.
  */
-export function useIdleUi(paused: boolean, delayMs = 3600) {
+export function useIdleUi(paused: boolean, delayMs = 8000) {
   const [idle, setIdle] = useState(false);
 
   useEffect(() => {

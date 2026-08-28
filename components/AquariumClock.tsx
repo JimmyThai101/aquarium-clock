@@ -97,18 +97,6 @@ export function AquariumClock() {
           onDismissEvent={nextEvent.clearEvent}
         />
 
-        {eventPanelOpen ? (
-          <EventPanel
-            event={nextEvent.event}
-            now={clock.now}
-            targetTimeLabel={nextEvent.targetTimeLabel}
-            onSetAt={nextEvent.setEventAt}
-            onSetTimer={nextEvent.setTimer}
-            onClear={nextEvent.clearEvent}
-            onClose={() => setEventPanelOpen(false)}
-          />
-        ) : null}
-
         <ClockControls
           format={clock.format}
           onToggleFormat={clock.toggleFormat}
@@ -127,9 +115,29 @@ export function AquariumClock() {
           onToggleFullscreen={toggleFullscreen}
           reducedMotion={reducedMotion}
           onToggleReducedMotion={toggleReducedMotion}
-          hidden={idle}
+          hidden={idle && !eventPanelOpen}
         />
       </main>
+
+      {eventPanelOpen ? (
+        <div className="event-overlay">
+          <button
+            type="button"
+            className="event-overlay-scrim"
+            aria-label="Close event panel"
+            onClick={() => setEventPanelOpen(false)}
+          />
+          <EventPanel
+            event={nextEvent.event}
+            now={clock.now}
+            targetTimeLabel={nextEvent.targetTimeLabel}
+            onSetAt={nextEvent.setEventAt}
+            onSetTimer={nextEvent.setTimer}
+            onClear={nextEvent.clearEvent}
+            onClose={() => setEventPanelOpen(false)}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

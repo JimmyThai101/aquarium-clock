@@ -54,6 +54,7 @@ export function EventPanel({
       className="event-panel"
       onSubmit={handleSubmit}
       aria-label="Set next event"
+      onClick={(click) => click.stopPropagation()}
     >
       <p className="event-panel-title">Next event</p>
       {event && targetTimeLabel ? (
