@@ -54,21 +54,26 @@ body {
 /* ——— Clock ——— */
 
 .clock-display {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  max-width: min(92vw, 40rem);
+  max-width: min(92vw, 42rem);
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1.35rem 1.75rem 1.5rem;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(180, 230, 255, 0.18);
+  padding: 1.5rem 1.85rem 1.6rem;
+  border-radius: 1.55rem;
+  border: 3px solid rgba(210, 240, 255, 0.28);
   background: linear-gradient(
     165deg,
     rgba(8, 36, 54, 0.48) 0%,
     rgba(10, 48, 70, 0.32) 100%
   );
   backdrop-filter: blur(14px);
-  box-shadow: var(--clock-shadow);
+  box-shadow:
+    var(--clock-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -28px 40px rgba(0, 30, 50, 0.18);
 }
 
 .clock-brand {
@@ -83,17 +88,30 @@ body {
 
 .clock-time {
   margin: 0;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-display), var(--font-geist-sans), sans-serif;
   font-size: clamp(2.75rem, 12vw, 6.5rem);
   font-weight: 600;
   line-height: 1.05;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: #f2faff;
   text-shadow:
     0 0 40px rgba(120, 200, 240, 0.25),
     0 2px 4px rgba(0, 20, 40, 0.35),
     0 10px 30px rgba(0, 20, 40, 0.4);
   font-variant-numeric: tabular-nums;
+  animation: water-warp 7s ease-in-out infinite;
+}
+
+@keyframes water-warp {
+  0%,
+  100% {
+    transform: scaleX(1) skewX(0deg);
+    filter: blur(0);
+  }
+  50% {
+    transform: scaleX(1.012) skewX(0.35deg);
+    filter: blur(0.12px);
+  }
 }
 
 .clock-date {
@@ -110,6 +128,187 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(150, 210, 240, 0.8);
+}
+
+.clock-event {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin: 0.7rem 0 0;
+  font-size: clamp(0.88rem, 2.4vw, 1.08rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: rgba(190, 232, 255, 0.95);
+  text-shadow: 0 1px 10px rgba(0, 20, 40, 0.4);
+}
+
+.clock-event--due {
+  color: #ffe7b0;
+}
+
+.clock-event-dismiss {
+  min-height: 2rem;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid rgba(255, 230, 180, 0.45);
+  border-radius: 999px;
+  background: rgba(40, 28, 10, 0.45);
+  color: #ffe7b0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clock-display--due {
+  box-shadow:
+    var(--clock-shadow),
+    0 0 0 1px rgba(255, 220, 150, 0.35),
+    0 0 36px rgba(255, 190, 90, 0.28);
+}
+
+.clock-tank-shine {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 42%;
+  height: 38%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.16),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.clock-waterline {
+  position: absolute;
+  top: 0.7rem;
+  left: 9%;
+  right: 9%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.clock-droplet {
+  position: absolute;
+  width: 5px;
+  height: 8px;
+  border-radius: 50% 50% 50% 50% / 38% 38% 62% 62%;
+  background: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+}
+
+.clock-droplet--a {
+  top: 1.4rem;
+  right: 1.6rem;
+}
+
+.clock-droplet--b {
+  top: 2.3rem;
+  right: 2.5rem;
+  width: 4px;
+  height: 6px;
+  opacity: 0.7;
+}
+
+.clock-droplet--c {
+  top: 1.8rem;
+  left: 1.7rem;
+  width: 3px;
+  height: 5px;
+  opacity: 0.55;
+}
+
+.clock-second-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.clock-second-ring-track,
+.clock-second-ring-progress {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.clock-second-ring-track {
+  stroke: rgba(180, 230, 255, 0.16);
+  stroke-width: 1.15;
+}
+
+.clock-second-ring-progress {
+  stroke: rgba(210, 245, 255, 0.85);
+  stroke-width: 1.35;
+  filter: drop-shadow(0 0 4px rgba(160, 230, 255, 0.55));
+  transform-origin: 50% 50%;
+}
+
+.clock-minute-ripple {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(200, 240, 255, 0.55);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.4);
+}
+
+.clock-display--minute .clock-minute-ripple {
+  animation: minute-ripple 1.6s ease-out;
+}
+
+@keyframes minute-ripple {
+  0% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(18);
+  }
+}
+
+.clock-worlds {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem 1.25rem;
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.clock-worlds li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 5.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(170, 220, 245, 0.75);
+}
+
+.clock-worlds strong {
+  font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(230, 248, 255, 0.95);
 }
 
 .clock-loading {
@@ -146,6 +345,15 @@ body {
   justify-content: center;
   gap: 0.65rem;
   max-width: 100%;
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+}
+
+.clock-controls--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
 }
 
 .clock-btn {
@@ -182,6 +390,95 @@ body {
 .clock-btn[aria-pressed="true"] {
   border-color: rgba(140, 220, 255, 0.7);
   background: rgba(30, 90, 120, 0.65);
+}
+
+.event-panel {
+  display: flex;
+  width: min(92vw, 22rem);
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem 1.05rem;
+  border-radius: 1.15rem;
+  border: 1px solid var(--control-border);
+  background: var(--control-bg);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 28px rgba(0, 20, 40, 0.32);
+}
+
+.event-panel-title {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(200, 236, 255, 0.92);
+}
+
+.event-panel-current {
+  margin: -0.35rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(190, 225, 245, 0.8);
+}
+
+.event-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(180, 220, 240, 0.85);
+}
+
+.event-input {
+  min-height: 2.6rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--control-border);
+  border-radius: 0.7rem;
+  background: rgba(6, 24, 36, 0.55);
+  color: #eef8ff;
+  color-scheme: dark;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.event-input:focus {
+  outline: 2px solid rgba(180, 230, 255, 0.65);
+  outline-offset: 1px;
+}
+
+.event-mode {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.event-mode-btn,
+.event-action-btn {
+  flex: 1 1 auto;
+}
+
+.event-mode-btn {
+  min-height: 2.4rem;
+  border: 1px solid var(--control-border);
+  border-radius: 0.7rem;
+  background: rgba(8, 32, 48, 0.4);
+  color: #e8f6ff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.event-mode-btn[aria-pressed="true"] {
+  border-color: rgba(140, 220, 255, 0.7);
+  background: rgba(30, 90, 120, 0.65);
+}
+
+.event-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 /* ——— Aquarium scene ——— */
@@ -510,6 +807,820 @@ body {
 .aquarium--reduced-motion .aquarium-bubble {
   bottom: 20%;
   opacity: 0.2;
+}
+
+.aquarium-clock[data-scene="beach"] {
+  --control-bg: rgba(48, 28, 16, 0.5);
+  --control-border: rgba(255, 214, 170, 0.32);
+  --control-hover: rgba(72, 40, 20, 0.7);
+}
+
+.aquarium-clock[data-scene="beach"] .clock-display {
+  border-color: rgba(255, 220, 180, 0.22);
+  background: linear-gradient(
+    165deg,
+    rgba(42, 24, 14, 0.5) 0%,
+    rgba(36, 22, 14, 0.34) 100%
+  );
+}
+
+.aquarium-clock[data-scene="space"] {
+  --control-bg: rgba(18, 12, 36, 0.55);
+  --control-border: rgba(186, 168, 255, 0.3);
+  --control-hover: rgba(36, 22, 70, 0.72);
+}
+
+.aquarium-clock[data-scene="space"] .clock-display {
+  border-color: rgba(180, 160, 255, 0.24);
+  background: linear-gradient(
+    165deg,
+    rgba(14, 10, 32, 0.55) 0%,
+    rgba(18, 12, 40, 0.36) 100%
+  );
+}
+
+.aquarium-clock--event-due .clock-display {
+  animation: event-glow 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes event-glow {
+  from {
+    box-shadow:
+      var(--clock-shadow),
+      0 0 0 1px rgba(255, 220, 150, 0.25);
+  }
+  to {
+    box-shadow:
+      var(--clock-shadow),
+      0 0 0 1px rgba(255, 230, 170, 0.55),
+      0 0 42px rgba(255, 190, 90, 0.35);
+  }
+}
+
+/* ——— Beach scene ——— */
+
+.beach {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    var(--sky-top) 0%,
+    var(--sky-mid) 42%,
+    var(--sky-horizon) 58%,
+    var(--water-color) 59%
+  );
+  transition: background 1.4s ease;
+}
+
+.beach-glow,
+.beach-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.beach-glow {
+  background: radial-gradient(
+    ellipse 70% 45% at 50% 40%,
+    var(--sky-glow),
+    transparent 70%
+  );
+}
+
+.beach-sun,
+.beach-moon {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transition:
+    left 1.4s ease,
+    right 1.4s ease,
+    top 1.4s ease;
+}
+
+.beach-sun {
+  width: 7rem;
+  height: 7rem;
+  background: radial-gradient(
+    circle at 38% 38%,
+    #fff8e0 0%,
+    var(--sun-color) 52%,
+    transparent 72%
+  );
+  box-shadow: 0 0 80px 28px var(--sky-glow);
+}
+
+.beach[data-period="morning"] .beach-sun {
+  left: 10%;
+  top: 22%;
+}
+
+.beach[data-period="afternoon"] .beach-sun {
+  left: 50%;
+  top: 8%;
+  transform: translateX(-50%);
+}
+
+.beach[data-period="evening"] .beach-sun {
+  right: 10%;
+  top: 26%;
+}
+
+.beach-moon {
+  left: 72%;
+  top: 12%;
+  width: 4.4rem;
+  height: 4.4rem;
+  background: radial-gradient(circle at 34% 32%, #f7f9ff, #c9d4ea 62%);
+  box-shadow: 0 0 40px 14px var(--sky-glow);
+}
+
+.beach-cloud {
+  position: absolute;
+  height: 2.4rem;
+  border-radius: 2rem;
+  background: rgba(255, 255, 255, 0.72);
+  filter: blur(0.4px);
+  animation: cloud-drift var(--cloud-duration) ease-in-out var(--cloud-delay)
+    infinite alternate;
+}
+
+.beach-cloud::before,
+.beach-cloud::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.beach-cloud::before {
+  width: 45%;
+  height: 140%;
+  left: 18%;
+  top: -70%;
+}
+
+.beach-cloud::after {
+  width: 38%;
+  height: 120%;
+  right: 16%;
+  top: -50%;
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(36px);
+  }
+}
+
+.beach-birds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.beach-bird {
+  position: absolute;
+  left: 0;
+  animation: bird-fly var(--bird-duration) linear var(--bird-delay) infinite;
+}
+
+@keyframes bird-fly {
+  from {
+    transform: translateX(-10vw);
+  }
+  to {
+    transform: translateX(110vw);
+  }
+}
+
+.beach[data-period="night"] .beach-bird {
+  opacity: 0.22;
+}
+
+.beach-wave {
+  position: absolute;
+  left: 0;
+  width: 200%;
+  pointer-events: none;
+}
+
+.beach-wave--back {
+  bottom: 15%;
+  height: 24%;
+  animation: wave-drift 16s linear infinite;
+  opacity: 0.75;
+}
+
+.beach-wave--mid {
+  bottom: 11%;
+  height: 20%;
+  animation: wave-drift 11s linear infinite reverse;
+}
+
+.beach-wave--front {
+  bottom: 8%;
+  height: 16%;
+  animation: wave-drift 8s linear infinite;
+}
+
+@keyframes wave-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.beach-sand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 14%;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--sand-color) 30%, transparent) 0%,
+    var(--sand-color) 45%
+  );
+  pointer-events: none;
+}
+
+.beach-palm {
+  position: absolute;
+  bottom: 5%;
+  height: 46%;
+  width: auto;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.28));
+}
+
+.beach-palm--left {
+  left: 0.5%;
+}
+
+.beach-palm--right {
+  right: 0.5%;
+  transform: scaleX(-1);
+}
+
+.beach-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(20, 10, 0, 0.28) 100%
+  );
+}
+
+/* ——— Space scene ——— */
+
+.space-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    var(--space-top) 0%,
+    var(--space-mid) 48%,
+    var(--space-bottom) 100%
+  );
+  transition: background 1.4s ease;
+}
+
+.space-nebula,
+.space-glow,
+.space-vignette {
+  position: absolute;
+  pointer-events: none;
+}
+
+.space-nebula {
+  width: 70%;
+  height: 55%;
+  border-radius: 50%;
+  filter: blur(40px);
+  animation: nebula-breathe 12s ease-in-out infinite alternate;
+}
+
+.space-nebula--a {
+  left: -10%;
+  top: 8%;
+  background: var(--nebula-a);
+}
+
+.space-nebula--b {
+  right: -8%;
+  bottom: 12%;
+  width: 60%;
+  height: 50%;
+  background: var(--nebula-b);
+  animation-delay: -4s;
+}
+
+@keyframes nebula-breathe {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+.space-glow {
+  inset: 0;
+  background: radial-gradient(
+    ellipse 50% 40% at 70% 24%,
+    var(--space-glow),
+    transparent 70%
+  );
+}
+
+.space-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  animation: star-twinkle var(--star-duration) ease-in-out var(--star-delay)
+    infinite alternate;
+}
+
+@keyframes star-twinkle {
+  from {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.space-planet {
+  position: absolute;
+  right: 11%;
+  top: 16%;
+  width: 9rem;
+  height: 9rem;
+  animation: planet-float 14s ease-in-out infinite alternate;
+}
+
+.space-planet-body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 32% 28%,
+    #fff 0%,
+    var(--planet-color) 38%,
+    var(--planet-accent) 78%
+  );
+  box-shadow:
+    inset -18px -12px 28px rgba(0, 0, 0, 0.35),
+    0 0 48px var(--space-glow);
+}
+
+.space-planet-ring {
+  position: absolute;
+  left: -32%;
+  top: 42%;
+  width: 164%;
+  height: 30%;
+  border: 3px solid rgba(255, 255, 255, 0.32);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+
+@keyframes planet-float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(14px);
+  }
+}
+
+.space-meteor {
+  position: absolute;
+  width: 92px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #fff);
+  opacity: 0;
+  transform: rotate(-28deg);
+  animation: meteor-streak 11s linear infinite;
+}
+
+.space-meteor--a {
+  top: 18%;
+  left: 8%;
+}
+
+.space-meteor--b {
+  top: 42%;
+  left: 40%;
+  animation-delay: -6s;
+  animation-duration: 14s;
+}
+
+@keyframes meteor-streak {
+  0%,
+  86% {
+    opacity: 0;
+    transform: rotate(-28deg) translateX(0);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-28deg) translateX(55vw);
+  }
+}
+
+.space-vignette {
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 48%,
+    rgba(0, 0, 8, 0.45) 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beach:not(.beach--allow-motion) .beach-cloud,
+  .beach:not(.beach--allow-motion) .beach-bird,
+  .beach:not(.beach--allow-motion) .beach-wave,
+  .space-scene:not(.space-scene--allow-motion) .space-star,
+  .space-scene:not(.space-scene--allow-motion) .space-nebula,
+  .space-scene:not(.space-scene--allow-motion) .space-planet,
+  .space-scene:not(.space-scene--allow-motion) .space-meteor {
+    animation: none !important;
+  }
+
+  .aquarium-clock--event-due .clock-display {
+    animation: none;
+  }
+}
+
+.beach--reduced-motion .beach-cloud,
+.beach--reduced-motion .beach-bird,
+.beach--reduced-motion .beach-wave,
+.space-scene--reduced-motion .space-star,
+.space-scene--reduced-motion .space-nebula,
+.space-scene--reduced-motion .space-planet,
+.space-scene--reduced-motion .space-meteor {
+  animation: none !important;
+}
+
+.beach--reduced-motion .beach-bird:nth-child(1) {
+  left: 18%;
+}
+
+.beach--reduced-motion .beach-bird:nth-child(2) {
+  left: 48%;
+}
+
+.beach--reduced-motion .beach-bird:nth-child(3) {
+  left: 72%;
+}
+
+.aquarium-clock--reduced-motion .clock-display,
+.aquarium-clock--reduced-motion.aquarium-clock--event-due .clock-display {
+  animation: none;
+}
+
+.aquarium-clock--reduced-motion .clock-time,
+.aquarium-clock--reduced-motion .clock-minute-ripple,
+.aquarium-clock--reduced-motion .clock-second-ring-progress {
+  animation: none;
+  filter: none;
+  transform: none;
+  transition: none;
+}
+
+/* ——— Live aquarium extras ——— */
+
+.aquarium-caustics {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  background:
+    radial-gradient(
+      ellipse 42% 22% at 18% 8%,
+      rgba(255, 255, 255, 0.4),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 36% 18% at 72% 0%,
+      rgba(210, 245, 255, 0.32),
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 28% 16% at 48% 12%,
+      rgba(255, 255, 255, 0.22),
+      transparent 55%
+    );
+  background-size: 140% 90%;
+  animation: caustic-shift 10s ease-in-out infinite alternate;
+}
+
+@keyframes caustic-shift {
+  from {
+    background-position: 0% 0%, 100% 0%, 40% 0%;
+  }
+  to {
+    background-position: 18% 12%, 80% 8%, 55% 10%;
+  }
+}
+
+.aquarium-night-sky {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 22%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.aquarium-moon {
+  position: absolute;
+  right: 12%;
+  top: 18%;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 32%, #f7f9ff, #c9d4ea 62%);
+  box-shadow: 0 0 24px 8px rgba(180, 210, 255, 0.28);
+}
+
+.aquarium-sky-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: star-twinkle var(--star-duration) ease-in-out var(--star-delay)
+    infinite alternate;
+}
+
+.aquarium-jellies {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.aquarium-jelly {
+  position: absolute;
+  animation: jelly-drift var(--jelly-duration) ease-in-out var(--jelly-delay)
+    infinite alternate;
+}
+
+@keyframes jelly-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(14px, 18px);
+  }
+}
+
+.aquarium-turtle {
+  position: absolute;
+  left: 0;
+}
+
+.aquarium-crab {
+  position: absolute;
+  left: 8%;
+  z-index: 2;
+  pointer-events: none;
+  animation: crab-walk var(--crab-duration) ease-in-out infinite alternate;
+}
+
+@keyframes crab-walk {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(28vw);
+  }
+}
+
+.aquarium-chest {
+  position: absolute;
+  right: 16%;
+  bottom: 7%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.aquarium-chest-lid {
+  transform-origin: 40px 26px;
+  transition: transform 0.6s ease;
+}
+
+.aquarium-chest--open .aquarium-chest-lid {
+  transform: rotate(-42deg);
+}
+
+.aquarium-chest-burst {
+  position: absolute;
+  left: 50%;
+  bottom: 70%;
+}
+
+.aquarium-chest-burst i {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(200, 235, 255, 0.2);
+  animation: bubble-rise 2.4s linear infinite;
+}
+
+.aquarium-chest-burst i:nth-child(1) {
+  left: -10px;
+  animation-duration: 2.1s;
+}
+.aquarium-chest-burst i:nth-child(2) {
+  left: 4px;
+  animation-delay: -0.3s;
+}
+.aquarium-chest-burst i:nth-child(3) {
+  left: 14px;
+  animation-duration: 2.6s;
+  animation-delay: -0.6s;
+}
+.aquarium-chest-burst i:nth-child(4) {
+  left: -2px;
+  animation-duration: 1.9s;
+  animation-delay: -0.15s;
+}
+.aquarium-chest-burst i:nth-child(5) {
+  left: 20px;
+  animation-delay: -0.8s;
+}
+
+.aquarium-decor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6%;
+  height: 28%;
+  pointer-events: none;
+}
+
+.aquarium-castle {
+  position: absolute;
+  left: 36%;
+  bottom: 0;
+  opacity: 0.92;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+}
+
+.aquarium-coral {
+  position: absolute;
+  bottom: 0;
+}
+
+.aquarium-rock {
+  position: absolute;
+  bottom: -6%;
+}
+
+.aquarium-rock--a {
+  left: 8%;
+}
+
+.aquarium-rock--b {
+  right: 28%;
+}
+
+.aquarium--bio .aquarium-fish,
+.aquarium--bio .aquarium-turtle {
+  filter: drop-shadow(0 0 8px rgba(140, 230, 255, 0.7));
+}
+
+.aquarium--bio .aquarium-particle {
+  box-shadow: 0 0 8px 2px rgba(140, 230, 255, 0.55);
+}
+
+.aquarium--bio .aquarium-jelly {
+  filter: drop-shadow(0 0 14px rgba(160, 230, 255, 0.7));
+}
+
+.aquarium-click-fx {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.aquarium-knock {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  animation: knock-ripple 0.9s ease-out forwards;
+}
+
+.aquarium-click-bubble {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(200, 235, 255, 0.2);
+  animation: bubble-rise 2.4s linear forwards;
+}
+
+.aquarium-click-bubble--b {
+  left: 6px;
+  width: 6px;
+  height: 6px;
+  animation-duration: 2.1s;
+}
+
+.aquarium-click-bubble--c {
+  left: -12px;
+  width: 5px;
+  height: 5px;
+  animation-duration: 2.7s;
+}
+
+@keyframes knock-ripple {
+  to {
+    transform: scale(6);
+    opacity: 0;
+  }
+}
+
+.weather-rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+
+.weather-drop {
+  position: absolute;
+  top: -12%;
+  width: 1.5px;
+  height: 12%;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.5));
+  animation: rain-fall var(--rain-duration) linear var(--rain-delay) infinite;
+}
+
+@keyframes rain-fall {
+  to {
+    transform: translateY(110vh);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clock-time,
+  .clock-minute-ripple,
+  .aquarium-caustics,
+  .aquarium-jelly,
+  .aquarium-crab,
+  .aquarium-sky-star,
+  .weather-drop {
+    animation: none !important;
+  }
+}
+
+.aquarium--reduced-motion .aquarium-caustics,
+.aquarium--reduced-motion .aquarium-jelly,
+.aquarium--reduced-motion .aquarium-crab,
+.aquarium--reduced-motion .aquarium-sky-star,
+.aquarium--reduced-motion .aquarium-turtle,
+.aquarium--reduced-motion .weather-drop,
+.beach--reduced-motion .weather-drop {
+  animation: none !important;
+}
+
+.aquarium--reduced-motion .aquarium-turtle {
+  left: 40%;
+}
+
+.aquarium--reduced-motion .aquarium-crab {
+  left: 22%;
 }
 
 @media (max-width: 480px) {

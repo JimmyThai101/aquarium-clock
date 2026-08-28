@@ -326,6 +326,10 @@ export const STORAGE_KEYS = {
   format: "aquarium-clock-format",
   reducedMotion: "aquarium-clock-reduced-motion",
   lighting: "aquarium-clock-lighting",
+  scene: "aquarium-clock-scene",
+  event: "aquarium-clock-event",
+  look: "aquarium-clock-look",
+  sound: "aquarium-clock-sound",
 } as const;
 
 export type ClockFormat = "12" | "24";
